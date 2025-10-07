@@ -1,16 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
+        <?import javafx.geometry.Insets?>
+        <?import javafx.scene.control.*?>
+        <?import javafx.scene.layout.*?>
+        <?import javafx.scene.text.*?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.courseworkappelectives.LoginController"
+      spacing="20" alignment="CENTER" styleClass="root-container">
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.courseworkappelectives.HelloController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets top="30" right="40" bottom="30" left="40"/>
     </padding>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
+    <Label text="Система записи на факультативы" styleClass="main-title">
+        <font>
+            <Font name="System Bold" size="28"/>
+        </font>
+    </Label>
+
+    <HBox spacing="30" alignment="CENTER">
+
+        <VBox spacing="15" styleClass="form-section" prefWidth="300">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Вход" styleClass="section-title"/>
+
+            <Label text="Номер телефона:" styleClass="field-label"/>
+            <TextField fx:id="phoneField" promptText="Введите номер телефона" styleClass="custom-field"/>
+
+            <Label text="Пароль:" styleClass="field-label"/>
+            <PasswordField fx:id="passwordField" promptText="Введите пароль" styleClass="custom-field"/>
+
+            <Button text="Войти" styleClass="primary-button" prefWidth="260"/>
+        </VBox>
+
+        <VBox spacing="15" styleClass="form-section" prefWidth="300">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Регистрация" styleClass="section-title"/>
+
+            <Label text="Фамилия:*" styleClass="field-label"/>
+            <TextField fx:id="regSurnameField" promptText="Фамилия" styleClass="custom-field"/>
+
+            <Label text="Имя:*" styleClass="field-label"/>
+            <TextField fx:id="regNameField" promptText="Имя" styleClass="custom-field"/>
+
+            <Label text="Отчество:" styleClass="field-label"/>
+            <TextField fx:id="regPatronymicField" promptText="Отчество" styleClass="custom-field"/>
+
+            <Label text="Адрес:" styleClass="field-label"/>
+            <TextField fx:id="regAddressField" promptText="Адрес" styleClass="custom-field"/>
+
+            <Label text="Номер телефона:*" styleClass="field-label"/>
+            <TextField fx:id="regPhoneField" promptText="Номер телефона" styleClass="custom-field"/>
+
+            <Label text="Пароль:*" styleClass="field-label"/>
+            <PasswordField fx:id="regPasswordField" promptText="Пароль" styleClass="custom-field"/>
+
+            <Button text="Зарегистрироваться" styleClass="primary-button" prefWidth="260"/>
+        </VBox>
+    </HBox>
+
+    <Label fx:id="statusLabel" styleClass="status-label"/>
 </VBox>
