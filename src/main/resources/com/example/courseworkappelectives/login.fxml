@@ -6,7 +6,8 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.courseworkappelectives.LoginController"
-      spacing="20" alignment="CENTER" styleClass="root-container">
+      spacing="20" alignment="CENTER" styleClass="root-container"
+      stylesheets="@styles.css">
 
     <padding>
         <Insets top="30" right="40" bottom="30" left="40"/>
