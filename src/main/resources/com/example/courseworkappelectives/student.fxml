@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.courseworkappelectives.controllers.StudentController"
+      spacing="10" stylesheets="@styles.css">
+
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #e9eff5;">
+        <padding>
+            <Insets top="15" right="20" bottom="15" left="20"/>
+        </padding>
+
+        <Label text="Студенческий портал" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Выйти" onAction="#handleLogout"/>
+    </HBox>
+
+    <VBox spacing="10" padding="20">
+        <Label fx:id="studentInfoLabel" text="Информация о студенте" style="-fx-font-size: 14px;"/>
+
+        <TitledPane text="Мои факультативы" expanded="true">
+            <VBox spacing="5" padding="10">
+                <TableView fx:id="enrollmentsTable" prefHeight="200">
+                    <columns>
+                        <TableColumn text="Факультатив"/>
+                        <TableColumn text="Год"/>
+                        <TableColumn text="Семестр"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </TitledPane>
+
+        <TitledPane text="Оценки" expanded="true">
+            <VBox spacing="5" padding="10">
+                <TableView fx:id="gradesTable" prefHeight="200">
+                    <columns>
+                        <TableColumn text="Факультатив"/>
+                        <TableColumn text="Дата"/>
+                        <TableColumn text="Оценка"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </TitledPane>
+    </VBox>
+</VBox>
+
