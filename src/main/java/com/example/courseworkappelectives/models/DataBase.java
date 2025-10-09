@@ -1,4 +1,4 @@
-package com.example.courseworkappelectives;
+package com.example.courseworkappelectives.models;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

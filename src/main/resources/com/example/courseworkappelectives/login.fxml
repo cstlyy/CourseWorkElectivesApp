@@ -4,14 +4,23 @@
         <?import javafx.scene.layout.*?>
         <?import javafx.scene.text.*?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.courseworkappelectives.LoginController"
+      fx:controller="com.example.courseworkappelectives.controllers.LoginController"
       spacing="20" alignment="CENTER" styleClass="root-container"
       stylesheets="@styles.css">
 
     <padding>
         <Insets top="30" right="40" bottom="30" left="40"/>
     </padding>
+
+    <ImageView fitHeight="70" fitWidth="70">
+        <image>
+            <Image url="@logo.png"/>
+        </image>
+    </ImageView>
+
 
     <Label text="Система записи на факультативы" styleClass="main-title">
         <font>
@@ -21,50 +30,70 @@
 
     <HBox spacing="30" alignment="CENTER">
 
-        <VBox spacing="15" styleClass="form-section" prefWidth="300">
+        <VBox spacing="15" styleClass="form-section" prefWidth="300"
+              style="-fx-background-color: white; -fx-border-color: #90caf9; -fx-border-radius: 10; -fx-background-radius: 10;">
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
 
             <Label text="Вход" styleClass="section-title"/>
 
-            <Label text="Номер телефона:" styleClass="field-label"/>
-            <TextField fx:id="phoneField" promptText="Введите номер телефона" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Номер телефона:" styleClass="field-label"/>
+                <TextField fx:id="phoneField" promptText="Введите номер телефона" styleClass="custom-field"/>
+            </VBox>
 
-            <Label text="Пароль:" styleClass="field-label"/>
-            <PasswordField fx:id="passwordField" promptText="Введите пароль" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Пароль:" styleClass="field-label"/>
+                <PasswordField fx:id="passwordField" promptText="Введите пароль" styleClass="custom-field"/>
+            </VBox>
 
-            <Button text="Войти" styleClass="primary-button" prefWidth="260"/>
+            <Button text="Войти" onAction="#handleLogin" styleClass="primary-button" prefWidth="260"/>
         </VBox>
 
-        <VBox spacing="15" styleClass="form-section" prefWidth="300">
+
+        <VBox spacing="15" styleClass="form-section" prefWidth="300"
+              style="-fx-background-color: white; -fx-border-color: #90caf9; -fx-border-radius: 10; -fx-background-radius: 10;">
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
 
             <Label text="Регистрация" styleClass="section-title"/>
 
-            <Label text="Фамилия:*" styleClass="field-label"/>
-            <TextField fx:id="regSurnameField" promptText="Фамилия" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Фамилия:*" styleClass="field-label"/>
+                <TextField fx:id="regSurnameField" promptText="Фамилия" styleClass="custom-field"/>
+            </VBox>
 
-            <Label text="Имя:*" styleClass="field-label"/>
-            <TextField fx:id="regNameField" promptText="Имя" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Имя:*" styleClass="field-label"/>
+                <TextField fx:id="regNameField" promptText="Имя" styleClass="custom-field"/>
+            </VBox>
 
-            <Label text="Отчество:" styleClass="field-label"/>
-            <TextField fx:id="regPatronymicField" promptText="Отчество" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Отчество:" styleClass="field-label"/>
+                <TextField fx:id="regPatronymicField" promptText="Отчество" styleClass="custom-field"/>
+            </VBox>
 
-            <Label text="Адрес:" styleClass="field-label"/>
-            <TextField fx:id="regAddressField" promptText="Адрес" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Адрес:" styleClass="field-label"/>
+                <TextField fx:id="regAddressField" promptText="Адрес" styleClass="custom-field"/>
+            </VBox>
 
-            <Label text="Номер телефона:*" styleClass="field-label"/>
-            <TextField fx:id="regPhoneField" promptText="Номер телефона" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Номер телефона:*" styleClass="field-label"/>
+                <TextField fx:id="regPhoneField" promptText="Номер телефона" styleClass="custom-field"/>
+            </VBox>
 
-            <Label text="Пароль:*" styleClass="field-label"/>
-            <PasswordField fx:id="regPasswordField" promptText="Пароль" styleClass="custom-field"/>
+            <VBox spacing="8">
+                <Label text="Пароль:*" styleClass="field-label"/>
+                <PasswordField fx:id="regPasswordField" promptText="Пароль" styleClass="custom-field"/>
+            </VBox>
 
-            <Button text="Зарегистрироваться" styleClass="primary-button" prefWidth="260"/>
+            <Button text="Зарегистрироваться" onAction="#handleRegister" styleClass="primary-button" prefWidth="260"/>
         </VBox>
     </HBox>
 
+    <!-- Статус -->
     <Label fx:id="statusLabel" styleClass="status-label"/>
 </VBox>

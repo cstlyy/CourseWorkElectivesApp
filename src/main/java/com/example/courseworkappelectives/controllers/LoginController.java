@@ -1,5 +1,6 @@
-package com.example.courseworkappelectives;
+package com.example.courseworkappelectives.controllers;
 
+import com.example.courseworkappelectives.models.DataBase;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
