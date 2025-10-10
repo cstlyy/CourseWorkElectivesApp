@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.courseworkappelectives.controllers.AdminController"
+      spacing="10" padding="20">
+
+    <Label text="Панель администратора" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS">
+
+        <Tab text="Кафедры" closable="false">
+            <TableView fx:id="departmentsTable">
+                <columns>
+                    <TableColumn fx:id="departmentIdColumn" text="ID"/>
+                    <TableColumn fx:id="departmentNameColumn" text="Название кафедры"/>
+                </columns>
+            </TableView>
+        </Tab>
+
+        <Tab text="Факультативы" closable="false">
+            <TableView fx:id="electivesTable">
+                <columns>
+                    <TableColumn fx:id="electiveIdColumn" text="ID"/>
+                    <TableColumn fx:id="electiveNameColumn" text="Факультатив"/>
+                    <TableColumn fx:id="electiveDepartmentColumn" text="Кафедра"/>
+                </columns>
+            </TableView>
+        </Tab>
+
+        <Tab text="Семестры" closable="false">
+            <TableView fx:id="semestersTable">
+                <columns>
+                    <TableColumn fx:id="semesterIdColumn" text="ID"/>
+                    <TableColumn fx:id="semesterYearColumn" text="Год"/>
+                    <TableColumn fx:id="semesterNumColumn" text="Номер"/>
+                    <TableColumn fx:id="semesterMinElectivesColumn" text="Мин. кол-во факультативов"/>
+                </columns>
+            </TableView>
+        </Tab>
+
+        <Tab text="Планы" closable="false">
+            <TableView fx:id="plansTable">
+                <columns>
+                    <TableColumn fx:id="planIdColumn" text="ID"/>
+                    <TableColumn fx:id="planElectiveColumn" text="Факультатив"/>
+                    <TableColumn fx:id="planSemesterColumn" text="Семестр"/>
+                    <TableColumn fx:id="planLectureColumn" text="Лекции"/>
+                    <TableColumn fx:id="planPracticeColumn" text="Практики"/>
+                    <TableColumn fx:id="planLabColumn" text="Лаб. работы"/>
+                    <TableColumn fx:id="planTotalColumn" text="Всего часов"/>
+                </columns>
+            </TableView>
+        </Tab>
+
+        <Tab text="Студенты" closable="false">
+            <TableView fx:id="studentsTable">
+                <columns>
+                    <TableColumn fx:id="studentIdColumn" text="ID"/>
+                    <TableColumn fx:id="studentSurnameColumn" text="Фамилия"/>
+                    <TableColumn fx:id="studentNameColumn" text="Имя"/>
+                    <TableColumn fx:id="studentPhoneColumn" text="Телефон"/>
+                    <TableColumn fx:id="studentAddressColumn" text="Адрес"/>
+                </columns>
+            </TableView>
+        </Tab>
+
+        <Tab text="Записи" closable="false">
+            <TableView fx:id="enrollmentsTable">
+                <columns>
+                    <TableColumn fx:id="enrollmentIdColumn" text="ID"/>
+                    <TableColumn fx:id="enrollmentStudentColumn" text="Студент"/>
+                    <TableColumn fx:id="enrollmentPlanColumn" text="План"/>
+                    <TableColumn fx:id="enrollmentSemesterColumn" text="Семестр"/>
+                </columns>
+            </TableView>
+        </Tab>
+
+        <Tab text="Оценки" closable="false">
+            <TableView fx:id="gradesTable">
+                <columns>
+                    <TableColumn fx:id="gradeIdColumn" text="ID"/>
+                    <TableColumn fx:id="gradeStudentColumn" text="Студент"/>
+                    <TableColumn fx:id="gradeElectiveColumn" text="Факультатив"/>
+                    <TableColumn fx:id="gradeDateColumn" text="Дата"/>
+                    <TableColumn fx:id="gradeValueColumn" text="Оценка"/>
+                </columns>
+            </TableView>
+        </Tab>
+    </TabPane>
+</VBox>
