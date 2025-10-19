@@ -6,92 +6,220 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.courseworkappelectives.controllers.AdminController"
-      spacing="10" padding="20">
+      spacing="0" styleClass="root-container"
+      stylesheets="@styles.css">
 
-    <Label text="Панель администратора" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+    <HBox styleClass="header" alignment="CENTER_LEFT" spacing="20">
+        <padding>
+            <Insets top="20" right="30" bottom="20" left="30"/>
+        </padding>
+        <VBox>
+            <Label text="Система записи на факультативы" styleClass="header-title"/>
+            <Label text="Административная панель" styleClass="header-subtitle"/>
+        </VBox>
 
-    <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS">
+        <Region HBox.hgrow="ALWAYS"/>
 
-        <Tab text="Кафедры" closable="false">
-            <TableView fx:id="departmentsTable">
-                <columns>
-                    <TableColumn fx:id="departmentIdColumn" text="ID"/>
-                    <TableColumn fx:id="departmentNameColumn" text="Название кафедры"/>
-                </columns>
-            </TableView>
-        </Tab>
+        <Button text="Изменить данные"  styleClass="secondary-button"/>
+        <Button text="Выход" onAction="#handleLogout" styleClass="logout-button"/>
+    </HBox>
 
-        <Tab text="Факультативы" closable="false">
-            <TableView fx:id="electivesTable">
-                <columns>
-                    <TableColumn fx:id="electiveIdColumn" text="ID"/>
-                    <TableColumn fx:id="electiveNameColumn" text="Факультатив"/>
-                    <TableColumn fx:id="electiveDepartmentColumn" text="Кафедра"/>
-                </columns>
-            </TableView>
-        </Tab>
+    <VBox spacing="10" styleClass="content-area">
+        <padding>
+            <Insets top="20" right="30" bottom="20" left="30"/>
+        </padding>
 
-        <Tab text="Семестры" closable="false">
-            <TableView fx:id="semestersTable">
-                <columns>
-                    <TableColumn fx:id="semesterIdColumn" text="ID"/>
-                    <TableColumn fx:id="semesterYearColumn" text="Год"/>
-                    <TableColumn fx:id="semesterNumColumn" text="Номер"/>
-                    <TableColumn fx:id="semesterMinElectivesColumn" text="Мин. кол-во факультативов"/>
-                </columns>
-            </TableView>
-        </Tab>
+        <TabPane fx:id="tabPane" styleClass="custom-tabs" VBox.vgrow="ALWAYS">
 
-        <Tab text="Планы" closable="false">
-            <TableView fx:id="plansTable">
-                <columns>
-                    <TableColumn fx:id="planIdColumn" text="ID"/>
-                    <TableColumn fx:id="planElectiveColumn" text="Факультатив"/>
-                    <TableColumn fx:id="planSemesterColumn" text="Семестр"/>
-                    <TableColumn fx:id="planLectureColumn" text="Лекции"/>
-                    <TableColumn fx:id="planPracticeColumn" text="Практики"/>
-                    <TableColumn fx:id="planLabColumn" text="Лаб. работы"/>
-                    <TableColumn fx:id="planTotalColumn" text="Всего часов"/>
-                </columns>
-            </TableView>
-        </Tab>
+            <Tab text="Кафедры" closable="false">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
 
-        <Tab text="Студенты" closable="false">
-            <TableView fx:id="studentsTable">
-                <columns>
-                    <TableColumn fx:id="studentIdColumn" text="ID"/>
-                    <TableColumn fx:id="studentSurnameColumn" text="Фамилия"/>
-                    <TableColumn fx:id="studentNameColumn" text="Имя"/>
-                    <TableColumn fx:id="studentPhoneColumn" text="Телефон"/>
-                    <TableColumn fx:id="studentAddressColumn" text="Адрес"/>
-                </columns>
-            </TableView>
-        </Tab>
+                    <Label text="Кафедры" styleClass="section-title"/>
 
-        <Tab text="Записи" closable="false">
-            <TableView fx:id="enrollmentsTable">
-                <columns>
-                    <TableColumn fx:id="enrollmentIdColumn" text="ID"/>
-                    <TableColumn fx:id="enrollmentStudentColumn" text="Студент"/>
-                    <TableColumn fx:id="enrollmentPlanColumn" text="План"/>
-                    <TableColumn fx:id="enrollmentSemesterColumn" text="Семестр"/>
-                </columns>
-            </TableView>
-        </Tab>
+                    <HBox spacing="10">
+                        <Button text="Добавить" styleClass="primary-button"/>
+                        <Button text="Редактировать" styleClass="secondary-button"/>
+                        <Button text="Удалить"  styleClass="secondary-button"/>
+                    </HBox>
 
-        <Tab text="Оценки" closable="false">
-            <TableView fx:id="gradesTable">
-                <columns>
-                    <TableColumn fx:id="gradeIdColumn" text="ID"/>
-                    <TableColumn fx:id="gradeStudentColumn" text="Студент"/>
-                    <TableColumn fx:id="gradeElectiveColumn" text="Факультатив"/>
-                    <TableColumn fx:id="gradeDateColumn" text="Дата"/>
-                    <TableColumn fx:id="gradeValueColumn" text="Оценка"/>
-                </columns>
-            </TableView>
-        </Tab>
-    </TabPane>
+                    <TableView fx:id="departmentsTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="deptIdColumn" text="ID" prefWidth="80"/>
+                            <TableColumn fx:id="deptNameColumn" text="Название кафедры" prefWidth="700"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="Факультативы" closable="false">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text="Факультативы" styleClass="section-title"/>
+
+                    <HBox spacing="10">
+                        <Button text="Добавить"  styleClass="primary-button"/>
+                        <Button text="Редактировать" styleClass="secondary-button"/>
+                        <Button text="Удалить" styleClass="secondary-button"/>
+                    </HBox>
+
+                    <TableView fx:id="electivesTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="electIdColumn" text="ID" prefWidth="80"/>
+                            <TableColumn fx:id="electNameColumn" text="Название" prefWidth="300"/>
+                            <TableColumn fx:id="electDeptIdColumn" text="ID кафедры" prefWidth="100"/>
+                            <TableColumn fx:id="electDeptNameColumn" text="Кафедра" prefWidth="300"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="Семестры" closable="false">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text="Семестры" styleClass="section-title"/>
+
+                    <HBox spacing="10">
+                        <Button text="Добавить" styleClass="primary-button"/>
+                        <Button text="Редактировать" styleClass="secondary-button"/>
+                        <Button text="Удалить" styleClass="secondary-button"/>
+                    </HBox>
+
+                    <TableView fx:id="semestersTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="semIdColumn" text="ID" prefWidth="80"/>
+                            <TableColumn fx:id="semYearColumn" text="Год" prefWidth="150"/>
+                            <TableColumn fx:id="semNumColumn" text="Номер семестра" prefWidth="200"/>
+                            <TableColumn fx:id="semMinColumn" text="Мин. факультативов" prefWidth="350"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="Планы" closable="false">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text="Планы факультативов" styleClass="section-title"/>
+
+                    <HBox spacing="10">
+                        <Button text="Добавить" styleClass="primary-button"/>
+                        <Button text="Редактировать" styleClass="secondary-button"/>
+                        <Button text="Удалить"  styleClass="secondary-button"/>
+                    </HBox>
+
+                    <TableView fx:id="plansTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="planIdCol" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="planElectIdCol" text="ID факультатива" prefWidth="120"/>
+                            <TableColumn fx:id="planElectCol" text="Факультатив" prefWidth="180"/>
+                            <TableColumn fx:id="planSemIdCol" text="ID семестра" prefWidth="100"/>
+                            <TableColumn fx:id="planYearCol" text="Год" prefWidth="70"/>
+                            <TableColumn fx:id="planSemCol" text="Семестр" prefWidth="80"/>
+                            <TableColumn fx:id="planLecCol" text="Лекции" prefWidth="70"/>
+                            <TableColumn fx:id="planPracCol" text="Практики" prefWidth="80"/>
+                            <TableColumn fx:id="planLabCol" text="Лабораторные работы" prefWidth="70"/>
+                            <TableColumn fx:id="planTotalCol" text="Всего" prefWidth="70"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="Студенты" closable="false">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text="Студенты" styleClass="section-title"/>
+
+                    <HBox spacing="10">
+                        <Button text="Добавить" styleClass="primary-button"/>
+                        <Button text="Редактировать"  styleClass="secondary-button"/>
+                        <Button text="Удалить" styleClass="secondary-button"/>
+                    </HBox>
+
+                    <TableView fx:id="studentsTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="studIdColumn" text="ID" prefWidth="60"/>
+                            <TableColumn fx:id="studSurnameColumn" text="Фамилия" prefWidth="150"/>
+                            <TableColumn fx:id="studNameColumn" text="Имя" prefWidth="150"/>
+                            <TableColumn fx:id="studPatronymicColumn" text="Отчество" prefWidth="150"/>
+                            <TableColumn fx:id="studAddressColumn" text="Адрес" prefWidth="200"/>
+                            <TableColumn fx:id="studPhoneColumn" text="Телефон" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="Записи" closable="false">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text="Записи студентов на факультативы" styleClass="section-title"/>
+
+                    <HBox spacing="10">
+                        <Button text="Добавить запись"  styleClass="primary-button"/>
+                        <Button text="Изменить запись"  styleClass="secondary-button"/>
+                        <Button text="Удалить запись" styleClass="secondary-button"/>
+                    </HBox>
+
+
+                    <TableView fx:id="enrollmentsTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="enrIdColumn" text="ID записи" prefWidth="90"/>
+                            <TableColumn fx:id="enrStudIdColumn" text="ID студента" prefWidth="100"/>
+                            <TableColumn fx:id="enrStudColumn" text="Студент" prefWidth="200"/>
+                            <TableColumn fx:id="enrPlanIdColumn" text="ID плана" prefWidth="80"/>
+                            <TableColumn fx:id="enrElectColumn" text="Факультатив" prefWidth="200"/>
+                            <TableColumn fx:id="enrYearColumn" text="Год" prefWidth="70"/>
+                            <TableColumn fx:id="enrSemColumn" text="Семестр" prefWidth="90"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <Tab text="Оценки" closable="false">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text="Оценки" styleClass="section-title"/>
+
+                    <HBox spacing="10">
+                        <Button text="Добавить" styleClass="primary-button"/>
+                        <Button text="Редактировать" styleClass="secondary-button"/>
+                        <Button text="Удалить" styleClass="secondary-button"/>
+                    </HBox>
+
+                    <TableView fx:id="gradesAdminTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="grIdColumn" text="ID оценки" prefWidth="90"/>
+                            <TableColumn fx:id="grEnrIdColumn" text="ID записи" prefWidth="90"/>
+                            <TableColumn fx:id="grStudColumn" text="Студент" prefWidth="220"/>
+                            <TableColumn fx:id="grElectColumn" text="Факультатив" prefWidth="220"/>
+                            <TableColumn fx:id="grDateColumn" text="Дата" prefWidth="120"/>
+                            <TableColumn fx:id="grValueColumn" text="Оценка" prefWidth="140"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </VBox>
 </VBox>

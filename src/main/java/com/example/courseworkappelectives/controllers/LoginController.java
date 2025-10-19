@@ -10,10 +10,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.*;
 
 public class LoginController {
     @FXML private TextField phoneField;
@@ -25,6 +25,7 @@ public class LoginController {
     @FXML private TextField regPhoneField;
     @FXML private PasswordField regPasswordField;
     @FXML private Label statusLabel;
+
 
     @FXML
     private void handleLogin() {
@@ -44,16 +45,32 @@ public class LoginController {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (!rs.next()) {
-                    statusLabel.setText("Неверный номер телефона или пароль");
+                    statusLabel.setText("неверный номер телефона или пароль");
                     return;
                 }
 
                 int userId = rs.getInt("user_id");
                 int roleId = rs.getInt("role_id");
-                String storedPassword = rs.getString("password");
+                String stored = rs.getString("password");
+                String inputHash = sha256(password);
 
-                if (!storedPassword.equals(password)) {
-                    statusLabel.setText("Неверный номер телефона или пароль");
+                boolean ok = false;
+                if (stored != null) {
+
+                    if (stored.equalsIgnoreCase(inputHash)) ok = true;
+                    else if (stored.equals(password)) {
+                        ok = true;
+                        try (PreparedStatement up = conn.prepareStatement(
+                                "UPDATE users SET password = ? WHERE user_id = ?")) {
+                            up.setString(1, inputHash);
+                            up.setInt(2, userId);
+                            up.executeUpdate();
+                        }
+                    }
+                }
+
+                if (!ok) {
+                    statusLabel.setText("неверный номер телефона или пароль");
                     return;
                 }
 
@@ -61,6 +78,7 @@ public class LoginController {
             }
         } catch (SQLException e) {
             statusLabel.setText("Ошибка подключения к БД");
+            e.printStackTrace();
         }
     }
 
@@ -81,20 +99,34 @@ public class LoginController {
         try (Connection conn = DataBase.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO users (surname, user_name, patronymic, address, phone, password, role_id) " +
-                             "VALUES (?, ?, ?, ?, ?, ?, 1)")) {
+                             "VALUES (?, ?, ?, ?, ?, ?, 1)",
+                     Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, surname);
             stmt.setString(2, name);
             stmt.setString(3, patronymic);
             stmt.setString(4, address);
             stmt.setString(5, phone);
-            stmt.setString(6, password);
+            stmt.setString(6, sha256(password));
 
-            stmt.executeUpdate();
-            statusLabel.setText("Регистрация успешна!");
+            int rows = stmt.executeUpdate();
 
+            if (rows > 0) {
+                try (ResultSet keys = stmt.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        int userId = keys.getInt(1);
+                        statusLabel.setText("Регистрация успешна!");
+                        openDashboard(userId, 1);
+                    }
+                }
+            }
         } catch (SQLException e) {
-            statusLabel.setText("Ошибка регистрации");
+            if (e.getMessage() != null && e.getMessage().contains("Duplicate entry")) {
+                statusLabel.setText("Телефон уже зарегистрирован");
+            } else {
+                statusLabel.setText("Ошибка регистрации");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -102,9 +134,9 @@ public class LoginController {
         try {
             FXMLLoader loader;
             if (roleId == 1) {
-                loader = new FXMLLoader(getClass().getResource("/com/example/appforstudents/student.fxml"));
+                loader = new FXMLLoader(getClass().getResource("/com/example/courseworkappelectives/student.fxml"));
             } else {
-                loader = new FXMLLoader(getClass().getResource("/com/example/appforstudents/admin.fxml"));
+                loader = new FXMLLoader(getClass().getResource("/com/example/courseworkappelectives/admin.fxml"));
             }
 
             Parent root = loader.load();
@@ -117,10 +149,24 @@ public class LoginController {
                 controller.setUserId(userId);
             }
 
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/com/example/courseworkappelectives/styles.css").toExternalForm());
+
             Stage stage = (Stage) phoneField.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.setScene(scene);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    private static String sha256(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] d = md.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(d.length * 2);
+            for (byte b : d) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 недоступен", e);
         }
     }
 }
