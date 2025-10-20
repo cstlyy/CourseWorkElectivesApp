@@ -23,7 +23,7 @@
 
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Button text="Изменить данные"  styleClass="secondary-button"/>
+        <Button text="Изменить данные" styleClass="secondary-button"/>
         <Button text="Выход" onAction="#handleLogout" styleClass="logout-button"/>
     </HBox>
 
@@ -43,9 +43,9 @@
                     <Label text="Кафедры" styleClass="section-title"/>
 
                     <HBox spacing="10">
-                        <Button text="Добавить" styleClass="primary-button"/>
-                        <Button text="Редактировать" styleClass="secondary-button"/>
-                        <Button text="Удалить"  styleClass="secondary-button"/>
+                        <Button text="Добавить" onAction="#handleAddDepartment" styleClass="primary-button"/>
+                        <Button text="Редактировать" onAction="#handleEditDepartment" styleClass="secondary-button"/>
+                        <Button text="Удалить" onAction="#handleDeleteDepartment" styleClass="secondary-button"/>
                     </HBox>
 
                     <TableView fx:id="departmentsTable" VBox.vgrow="ALWAYS" prefHeight="300">
@@ -66,9 +66,9 @@
                     <Label text="Факультативы" styleClass="section-title"/>
 
                     <HBox spacing="10">
-                        <Button text="Добавить"  styleClass="primary-button"/>
-                        <Button text="Редактировать" styleClass="secondary-button"/>
-                        <Button text="Удалить" styleClass="secondary-button"/>
+                        <Button text="Добавить" onAction="#handleAddElective" styleClass="primary-button"/>
+                        <Button text="Редактировать" onAction="#handleEditElective" styleClass="secondary-button"/>
+                        <Button text="Удалить" onAction="#handleDeleteElective" styleClass="secondary-button"/>
                     </HBox>
 
                     <TableView fx:id="electivesTable" VBox.vgrow="ALWAYS" prefHeight="300">

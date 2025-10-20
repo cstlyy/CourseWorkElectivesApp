@@ -5,18 +5,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Optional;
 
 public class AdminController {
 
@@ -330,6 +328,201 @@ public class AdminController {
         }
     }
 
+    @FXML
+    private void handleAddDepartment() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Добавить кафедру");
+        dialog.setHeaderText("Новая кафедра");
+        dialog.setContentText("Название:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "INSERT INTO departments (department_name) VALUES (?)")) {
+                stmt.setString(1, name);
+                stmt.executeUpdate();
+                loadDepartments();
+            } catch (SQLException e) {
+                showError("Ошибка добавления кафедры");
+            }
+        });
+    }
+
+    @FXML
+    private void handleEditDepartment() {
+        Department selected = departmentsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите кафедру");
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog(selected.getDepartmentName());
+        dialog.setTitle("Редактировать кафедру");
+        dialog.setHeaderText("Изменить название");
+        dialog.setContentText("Название:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE departments SET department_name = ? WHERE department_id = ?")) {
+                stmt.setString(1, name);
+                stmt.setInt(2, selected.getDepartmentId());
+                stmt.executeUpdate();
+                loadDepartments();
+            } catch (SQLException e) {
+                showError("Ошибка обновления кафедры");
+            }
+        });
+    }
+
+    @FXML
+    private void handleDeleteDepartment() {
+        Department selected = departmentsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите кафедру");
+            return;
+        }
+
+        if (confirmDelete("Удалить кафедру?")) {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "DELETE FROM departments WHERE department_id = ?")) {
+                stmt.setInt(1, selected.getDepartmentId());
+                stmt.executeUpdate();
+                loadDepartments();
+            } catch (SQLException e) {
+                showError("Ошибка удаления кафедры");
+            }
+        }
+    }
+
+    @FXML
+    private void handleAddElective() {
+        Dialog<ElectiveAdmin> dialog = createElectiveDialog(null);
+        Optional<ElectiveAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(elective -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "INSERT INTO electives (elective_name, department_id) VALUES (?, ?)")) {
+                stmt.setString(1, elective.getElectiveName());
+                stmt.setInt(2, elective.getDepartmentId());
+                stmt.executeUpdate();
+                loadElectives();
+            } catch (SQLException e) {
+                showError("Ошибка добавления факультатива");
+            }
+        });
+    }
+
+    @FXML
+    private void handleEditElective() {
+        ElectiveAdmin selected = electivesTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите факультатив");
+            return;
+        }
+
+        Dialog<ElectiveAdmin> dialog = createElectiveDialog(selected);
+        Optional<ElectiveAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(elective -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE electives SET elective_name = ?, department_id = ? WHERE elective_id = ?")) {
+                stmt.setString(1, elective.getElectiveName());
+                stmt.setInt(2, elective.getDepartmentId());
+                stmt.setInt(3, selected.getElectiveId());
+                stmt.executeUpdate();
+                loadElectives();
+            } catch (SQLException e) {
+                showError("Ошибка обновления факультатива");
+            }
+        });
+    }
+
+    @FXML
+    private void handleDeleteElective() {
+        ElectiveAdmin selected = electivesTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите факультатив");
+            return;
+        }
+
+        if (confirmDelete("Удалить факультатив?")) {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "DELETE FROM electives WHERE elective_id = ?")) {
+                stmt.setInt(1, selected.getElectiveId());
+                stmt.executeUpdate();
+                loadElectives();
+            } catch (SQLException e) {
+                showError("Ошибка удаления факультатива");
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+    private Dialog<ElectiveAdmin> createElectiveDialog(ElectiveAdmin existing) {
+        Dialog<ElectiveAdmin> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Добавить факультатив" : "Редактировать факультатив");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        TextField nameField = new TextField(existing != null ? existing.getElectiveName() : "");
+        ComboBox<Department> deptCombo = new ComboBox<>(departmentsList);
+        deptCombo.setConverter(new javafx.util.StringConverter<Department>() {
+            @Override
+            public String toString(Department object) {
+                return object != null ? object.getDepartmentName() : "";
+            }
+            @Override
+            public Department fromString(String string) {
+                return null;
+            }
+        });
+
+        if (existing != null) {
+            deptCombo.getSelectionModel().select(
+                    departmentsList.stream()
+                            .filter(d -> d.getDepartmentId() == existing.getDepartmentId())
+                            .findFirst().orElse(null)
+            );
+        }
+
+        grid.add(new Label("Название:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Кафедра:"), 0, 1);
+        grid.add(deptCombo, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                Department dept = deptCombo.getValue();
+                if (dept != null && !nameField.getText().isEmpty()) {
+                    return new ElectiveAdmin(0, nameField.getText(), dept.getDepartmentId(), dept.getDepartmentName());
+                }
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
 
     @FXML
     private void handleLogout() {
@@ -343,5 +536,18 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private boolean confirmDelete(String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText(message);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 }
