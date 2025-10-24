@@ -91,9 +91,9 @@
                     <Label text="Семестры" styleClass="section-title"/>
 
                     <HBox spacing="10">
-                        <Button text="Добавить" styleClass="primary-button"/>
-                        <Button text="Редактировать" styleClass="secondary-button"/>
-                        <Button text="Удалить" styleClass="secondary-button"/>
+                        <Button text="Добавить" onAction="#handleAddSemester" styleClass="primary-button"/>
+                        <Button text="Редактировать" onAction="#handleEditSemester" styleClass="secondary-button"/>
+                        <Button text="Удалить" onAction="#handleDeleteSemester" styleClass="secondary-button"/>
                     </HBox>
 
                     <TableView fx:id="semestersTable" VBox.vgrow="ALWAYS" prefHeight="300">
@@ -116,9 +116,9 @@
                     <Label text="Планы факультативов" styleClass="section-title"/>
 
                     <HBox spacing="10">
-                        <Button text="Добавить" styleClass="primary-button"/>
-                        <Button text="Редактировать" styleClass="secondary-button"/>
-                        <Button text="Удалить"  styleClass="secondary-button"/>
+                        <Button text="Добавить" onAction="#handleAddPlan" styleClass="primary-button"/>
+                        <Button text="Редактировать" onAction="#handleEditPlan" styleClass="secondary-button"/>
+                        <Button text="Удалить" onAction="#handleDeletePlan" styleClass="secondary-button"/>
                     </HBox>
 
                     <TableView fx:id="plansTable" VBox.vgrow="ALWAYS" prefHeight="300">
@@ -147,9 +147,9 @@
                     <Label text="Студенты" styleClass="section-title"/>
 
                     <HBox spacing="10">
-                        <Button text="Добавить" styleClass="primary-button"/>
-                        <Button text="Редактировать"  styleClass="secondary-button"/>
-                        <Button text="Удалить" styleClass="secondary-button"/>
+                        <Button text="Добавить" onAction="#handleAddStudent" styleClass="primary-button"/>
+                        <Button text="Редактировать" onAction="#handleEditStudent" styleClass="secondary-button"/>
+                        <Button text="Удалить" onAction="#handleDeleteStudent" styleClass="secondary-button"/>
                     </HBox>
 
                     <TableView fx:id="studentsTable" VBox.vgrow="ALWAYS" prefHeight="300">
@@ -174,9 +174,9 @@
                     <Label text="Записи студентов на факультативы" styleClass="section-title"/>
 
                     <HBox spacing="10">
-                        <Button text="Добавить запись"  styleClass="primary-button"/>
-                        <Button text="Изменить запись"  styleClass="secondary-button"/>
-                        <Button text="Удалить запись" styleClass="secondary-button"/>
+                        <Button text="Добавить запись" onAction="#handleAddEnrollment" styleClass="primary-button"/>
+                        <Button text="Изменить запись" onAction="#handleEditEnrollment" styleClass="secondary-button"/>
+                        <Button text="Удалить запись" onAction="#handleDeleteEnrollment" styleClass="secondary-button"/>
                     </HBox>
 
 
@@ -203,9 +203,9 @@
                     <Label text="Оценки" styleClass="section-title"/>
 
                     <HBox spacing="10">
-                        <Button text="Добавить" styleClass="primary-button"/>
-                        <Button text="Редактировать" styleClass="secondary-button"/>
-                        <Button text="Удалить" styleClass="secondary-button"/>
+                        <Button text="Добавить" onAction="#handleAddGrade" styleClass="primary-button"/>
+                        <Button text="Редактировать" onAction="#handleEditGrade" styleClass="secondary-button"/>
+                        <Button text="Удалить" onAction="#handleDeleteGrade" styleClass="secondary-button"/>
                     </HBox>
 
                     <TableView fx:id="gradesAdminTable" VBox.vgrow="ALWAYS" prefHeight="300">

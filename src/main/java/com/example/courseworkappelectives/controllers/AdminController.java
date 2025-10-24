@@ -14,6 +14,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class AdminController {
@@ -464,14 +465,6 @@ public class AdminController {
         }
     }
 
-
-
-
-
-
-
-
-
     private Dialog<ElectiveAdmin> createElectiveDialog(ElectiveAdmin existing) {
         Dialog<ElectiveAdmin> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Добавить факультатив" : "Редактировать факультатив");
@@ -523,7 +516,663 @@ public class AdminController {
         return dialog;
     }
 
+    @FXML
+    private void handleAddSemester() {
+        Dialog<SemesterAdmin> dialog = createSemesterDialog(null);
+        Optional<SemesterAdmin> result = dialog.showAndWait();
 
+        result.ifPresent(semester -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "INSERT INTO semesters (year, num, min_electives) VALUES (?, ?, ?)")) {
+                stmt.setInt(1, semester.getYear());
+                stmt.setInt(2, semester.getSemesterNum());
+                stmt.setInt(3, semester.getMinElectives());
+                stmt.executeUpdate();
+                loadSemesters();
+            } catch (SQLException e) {
+                showError("Ошибка добавления семестра");
+            }
+        });
+    }
+
+    @FXML
+    private void handleEditSemester() {
+        SemesterAdmin selected = semestersTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите семестр");
+            return;
+        }
+
+        Dialog<SemesterAdmin> dialog = createSemesterDialog(selected);
+        Optional<SemesterAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(semester -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE semesters SET year = ?, num = ?, min_electives = ? WHERE semester_id = ?")) {
+                stmt.setInt(1, semester.getYear());
+                stmt.setInt(2, semester.getSemesterNum());
+                stmt.setInt(3, semester.getMinElectives());
+                stmt.setInt(4, selected.getSemesterId());
+                stmt.executeUpdate();
+                loadSemesters();
+            } catch (SQLException e) {
+                showError("Ошибка обновления семестра");
+            }
+        });
+    }
+
+    @FXML
+    private void handleDeleteSemester() {
+        SemesterAdmin selected = semestersTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите семестр");
+            return;
+        }
+
+        if (confirmDelete("Удалить семестр?")) {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "DELETE FROM semesters WHERE semester_id = ?")) {
+                stmt.setInt(1, selected.getSemesterId());
+                stmt.executeUpdate();
+                loadSemesters();
+            } catch (SQLException e) {
+                showError("Ошибка удаления семестра");
+            }
+        }
+    }
+
+    @FXML
+    private void handleAddPlan() {
+        Dialog<PlanAdmin> dialog = createPlanDialog(null);
+        Optional<PlanAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(plan -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "INSERT INTO plan (elective_id, semester_id, lecture_hours, practice_hours, lab_hours) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setInt(1, plan.getElectiveId());
+                stmt.setInt(2, plan.getSemesterId());
+                stmt.setInt(3, plan.getLectureHours());
+                stmt.setInt(4, plan.getPracticeHours());
+                stmt.setInt(5, plan.getLabHours());
+                stmt.executeUpdate();
+                loadPlans();
+            } catch (SQLException e) {
+                showError("Ошибка добавления плана");
+            }
+        });
+    }
+
+    @FXML
+    private void handleEditPlan() {
+        PlanAdmin selected = plansTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите план");
+            return;
+        }
+
+        Dialog<PlanAdmin> dialog = createPlanDialog(selected);
+        Optional<PlanAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(plan -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE plan SET elective_id = ?, semester_id = ?, lecture_hours = ?, practice_hours = ?, lab_hours = ? WHERE plan_id = ?")) {
+                stmt.setInt(1, plan.getElectiveId());
+                stmt.setInt(2, plan.getSemesterId());
+                stmt.setInt(3, plan.getLectureHours());
+                stmt.setInt(4, plan.getPracticeHours());
+                stmt.setInt(5, plan.getLabHours());
+                stmt.setInt(6, selected.getPlanId());
+                stmt.executeUpdate();
+                loadPlans();
+            } catch (SQLException e) {
+                showError("Ошибка обновления плана");
+            }
+        });
+    }
+
+    @FXML
+    private void handleDeletePlan() {
+        PlanAdmin selected = plansTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите план");
+            return;
+        }
+
+        if (confirmDelete("Удалить план?")) {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "DELETE FROM plan WHERE plan_id = ?")) {
+                stmt.setInt(1, selected.getPlanId());
+                stmt.executeUpdate();
+                loadPlans();
+            } catch (SQLException e) {
+                showError("Ошибка удаления плана");
+            }
+        }
+    }
+
+    @FXML
+    private void handleAddStudent() {
+        Dialog<StudentAdmin> dialog = createStudentDialog(null);
+        Optional<StudentAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(student -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "INSERT INTO users (surname, user_name, patronymic, address, phone, password, role_id) VALUES (?, ?, ?, ?, ?, '123456', 1)")) {
+                stmt.setString(1, student.getSurname());
+                stmt.setString(2, student.getName());
+                stmt.setString(3, student.getPatronymic());
+                stmt.setString(4, student.getAddress());
+                stmt.setString(5, student.getPhone());
+                stmt.executeUpdate();
+                loadStudents();
+            } catch (SQLException e) {
+                showError("Ошибка добавления студента");
+            }
+        });
+    }
+
+    @FXML
+    private void handleEditStudent() {
+        StudentAdmin selected = studentsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите студента");
+            return;
+        }
+
+        Dialog<StudentAdmin> dialog = createStudentDialog(selected);
+        Optional<StudentAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(student -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE users SET surname = ?, user_name = ?, patronymic = ?, address = ?, phone = ? WHERE user_id = ?")) {
+                stmt.setString(1, student.getSurname());
+                stmt.setString(2, student.getName());
+                stmt.setString(3, student.getPatronymic());
+                stmt.setString(4, student.getAddress());
+                stmt.setString(5, student.getPhone());
+                stmt.setInt(6, selected.getUserId());
+                stmt.executeUpdate();
+                loadStudents();
+            } catch (SQLException e) {
+                showError("Ошибка обновления студента");
+            }
+        });
+    }
+
+    @FXML
+    private void handleDeleteStudent() {
+        StudentAdmin selected = studentsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите студента");
+            return;
+        }
+
+        if (confirmDelete("Удалить студента?")) {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "DELETE FROM users WHERE user_id = ?")) {
+                stmt.setInt(1, selected.getUserId());
+                stmt.executeUpdate();
+                loadStudents();
+            } catch (SQLException e) {
+                showError("Ошибка удаления студента");
+            }
+        }
+    }
+    private Dialog<EnrollmentAdmin> createEnrollmentDialog(EnrollmentAdmin existing) {
+        Dialog<EnrollmentAdmin> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Добавить запись" : "Изменить запись");
+        ObservableList<StudentAdmin> students = FXCollections.observableArrayList();
+        try (Connection conn = DataBase.getInstance().getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(
+                     "SELECT user_id, surname, user_name, patronymic, address, phone " +
+                             "FROM users WHERE role_id = 1 ORDER BY surname, user_name")) {
+            while (rs.next()) {
+                students.add(new StudentAdmin(
+                        rs.getInt("user_id"),
+                        rs.getString("surname"),
+                        rs.getString("user_name"),
+                        rs.getString("patronymic"),
+                        rs.getString("address"),
+                        rs.getString("phone")));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        ObservableList<PlanAdmin> plans = FXCollections.observableArrayList();
+        try (Connection conn = DataBase.getInstance().getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(
+                     "SELECT p.*, e.elective_name, s.year, s.num " +
+                             "FROM plan p " +
+                             "LEFT JOIN electives e ON p.elective_id = e.elective_id " +
+                             "LEFT JOIN semesters s ON p.semester_id = s.semester_id " +
+                             "ORDER BY s.year DESC, s.num DESC, e.elective_name")) {
+            while (rs.next()) {
+                plans.add(new PlanAdmin(
+                        rs.getInt("plan_id"),
+                        rs.getInt("elective_id"),
+                        rs.getString("elective_name"),
+                        rs.getInt("semester_id"),
+                        rs.getInt("year"),
+                        rs.getInt("num"),
+                        rs.getInt("lecture_hours"),
+                        rs.getInt("practice_hours"),
+                        rs.getInt("lab_hours")));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        ComboBox<StudentAdmin> studentCb = new ComboBox<>(students);
+        studentCb.setConverter(new javafx.util.StringConverter<>() {
+            public String toString(StudentAdmin s) { return s==null? "": s.getSurname()+" "+s.getName(); }
+            public StudentAdmin fromString(String s) { return null; }
+        });
+
+        ComboBox<PlanAdmin> planCb = new ComboBox<>(plans);
+        planCb.setConverter(new javafx.util.StringConverter<>() {
+            public String toString(PlanAdmin p) { return p==null? "": p.getElectiveName()+" — "+p.getYear()+"/"+p.getSemester(); }
+            public PlanAdmin fromString(String s) { return null; }
+        });
+
+        if (existing != null) {
+            students.stream().filter(s -> s.getUserId()==existing.getUserId()).findFirst().ifPresent(studentCb.getSelectionModel()::select);
+            plans.stream().filter(p -> p.getPlanId()==existing.getPlanId()).findFirst().ifPresent(planCb.getSelectionModel()::select);
+        }
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
+        grid.addRow(0, new Label("Студент:"), studentCb);
+        grid.addRow(1, new Label("План:"),    planCb);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == ButtonType.OK && studentCb.getValue()!=null && planCb.getValue()!=null) {
+                StudentAdmin s = studentCb.getValue();
+                PlanAdmin p = planCb.getValue();
+                return new EnrollmentAdmin(
+                        existing==null? 0 : existing.getStudentPlanId(),
+                        s.getUserId(),
+                        s.getSurname()+" "+s.getName(),
+                        p.getPlanId(),
+                        p.getElectiveName(),
+                        p.getYear(),
+                        p.getSemester()
+                );
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    @FXML
+    private void handleAddEnrollment() {
+        Dialog<EnrollmentAdmin> dialog = createEnrollmentDialog(null);
+        dialog.showAndWait().ifPresent(enr -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(
+                         "INSERT INTO student_plan (user_id, plan_id) VALUES (?, ?)")) {
+                ps.setInt(1, enr.getUserId());
+                ps.setInt(2, enr.getPlanId());
+                ps.executeUpdate();
+                loadEnrollments();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showError("Не удалось добавить запись");
+            }
+        });
+    }
+
+    @FXML
+    private void handleEditEnrollment() {
+        EnrollmentAdmin selected = enrollmentsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) { showError("Выберите запись"); return; }
+
+        Dialog<EnrollmentAdmin> dialog = createEnrollmentDialog(selected);
+        dialog.showAndWait().ifPresent(enr -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(
+                         "UPDATE student_plan SET user_id = ?, plan_id = ? WHERE student_plan_id = ?")) {
+                ps.setInt(1, enr.getUserId());
+                ps.setInt(2, enr.getPlanId());
+                ps.setInt(3, selected.getStudentPlanId());
+                ps.executeUpdate();
+                loadEnrollments();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showError("Не удалось изменить запись");
+            }
+        });
+    }
+
+    @FXML
+    private void handleDeleteEnrollment() {
+        EnrollmentAdmin selected = enrollmentsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите запись");
+            return;
+        }
+
+        if (confirmDelete("Удалить запись?")) {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "DELETE FROM student_plan WHERE student_plan_id = ?")) {
+                stmt.setInt(1, selected.getStudentPlanId());
+                stmt.executeUpdate();
+                loadEnrollments();
+            } catch (SQLException e) {
+                showError("Ошибка удаления записи");
+            }
+        }
+    }
+
+    @FXML
+    private void handleAddGrade() {
+        Dialog<GradeAdmin> dialog = createGradeDialog(null);
+        Optional<GradeAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(grade -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "INSERT INTO grades (student_plan_id, date_grade, value_grade) VALUES (?, ?, ?)")) {
+                stmt.setInt(1, grade.getStudentPlanId());
+                stmt.setDate(2, Date.valueOf(grade.getGradeDate()));
+                stmt.setString(3, grade.getGradeValue());
+                stmt.executeUpdate();
+                loadGrades();
+            } catch (SQLException e) {
+                showError("Ошибка добавления оценки");
+            }
+        });
+    }
+
+    @FXML
+    private void handleEditGrade() {
+        GradeAdmin selected = gradesAdminTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите оценку");
+            return;
+        }
+
+        Dialog<GradeAdmin> dialog = createGradeDialog(selected);
+        Optional<GradeAdmin> result = dialog.showAndWait();
+
+        result.ifPresent(grade -> {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE grades SET date_grade = ?, value_grade = ? WHERE grade_id = ?")) {
+                stmt.setDate(1, Date.valueOf(grade.getGradeDate()));
+                stmt.setString(2, grade.getGradeValue());
+                stmt.setInt(3, selected.getGradeId());
+                stmt.executeUpdate();
+                loadGrades();
+            } catch (SQLException e) {
+                showError("Ошибка обновления оценки");
+            }
+        });
+    }
+
+    @FXML
+    private void handleDeleteGrade() {
+        GradeAdmin selected = gradesAdminTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Выберите оценку");
+            return;
+        }
+
+        if (confirmDelete("Удалить оценку?")) {
+            try (Connection conn = DataBase.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
+                         "DELETE FROM grades WHERE grade_id = ?")) {
+                stmt.setInt(1, selected.getGradeId());
+                stmt.executeUpdate();
+                loadGrades();
+            } catch (SQLException e) {
+                showError("Ошибка удаления оценки");
+            }
+        }
+    }
+
+    private Dialog<SemesterAdmin> createSemesterDialog(SemesterAdmin existing) {
+        Dialog<SemesterAdmin> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Добавить семестр" : "Редактировать семестр");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        TextField yearField = new TextField(existing != null ? String.valueOf(existing.getYear()) : "");
+        TextField numField = new TextField(existing != null ? String.valueOf(existing.getSemesterNum()) : "");
+        TextField minField = new TextField(existing != null ? String.valueOf(existing.getMinElectives()) : "");
+
+        grid.add(new Label("Год:"), 0, 0);
+        grid.add(yearField, 1, 0);
+        grid.add(new Label("Номер семестра:"), 0, 1);
+        grid.add(numField, 1, 1);
+        grid.add(new Label("Мин. факультативов:"), 0, 2);
+        grid.add(minField, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                try {
+                    return new SemesterAdmin(0,
+                            Integer.parseInt(yearField.getText()),
+                            Integer.parseInt(numField.getText()),
+                            Integer.parseInt(minField.getText()));
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    private Dialog<PlanAdmin> createPlanDialog(PlanAdmin existing) {
+        Dialog<PlanAdmin> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Добавить план" : "Редактировать план");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        ComboBox<ElectiveAdmin> electCombo = new ComboBox<>(electivesList);
+        electCombo.setConverter(new javafx.util.StringConverter<ElectiveAdmin>() {
+            @Override
+            public String toString(ElectiveAdmin object) {
+                return object != null ? object.getElectiveName() : "";
+            }
+            @Override
+            public ElectiveAdmin fromString(String string) {
+                return null;
+            }
+        });
+
+        ComboBox<SemesterAdmin> semCombo = new ComboBox<>(semestersList);
+        semCombo.setConverter(new javafx.util.StringConverter<SemesterAdmin>() {
+            @Override
+            public String toString(SemesterAdmin object) {
+                return object != null ? object.getYear() + " год, семестр " + object.getSemesterNum() : "";
+            }
+            @Override
+            public SemesterAdmin fromString(String string) {
+                return null;
+            }
+        });
+
+        TextField lecField = new TextField(existing != null ? String.valueOf(existing.getLectureHours()) : "");
+        TextField pracField = new TextField(existing != null ? String.valueOf(existing.getPracticeHours()) : "");
+        TextField labField = new TextField(existing != null ? String.valueOf(existing.getLabHours()) : "");
+
+        if (existing != null) {
+            electCombo.getSelectionModel().select(
+                    electivesList.stream()
+                            .filter(e -> e.getElectiveId() == existing.getElectiveId())
+                            .findFirst().orElse(null)
+            );
+            semCombo.getSelectionModel().select(
+                    semestersList.stream()
+                            .filter(s -> s.getSemesterId() == existing.getSemesterId())
+                            .findFirst().orElse(null)
+            );
+        }
+
+        grid.add(new Label("Факультатив:"), 0, 0);
+        grid.add(electCombo, 1, 0);
+        grid.add(new Label("Семестр:"), 0, 1);
+        grid.add(semCombo, 1, 1);
+        grid.add(new Label("Лекции (часы):"), 0, 2);
+        grid.add(lecField, 1, 2);
+        grid.add(new Label("Практики (часы):"), 0, 3);
+        grid.add(pracField, 1, 3);
+        grid.add(new Label("Лабы (часы):"), 0, 4);
+        grid.add(labField, 1, 4);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                try {
+                    ElectiveAdmin elect = electCombo.getValue();
+                    SemesterAdmin sem = semCombo.getValue();
+                    if (elect != null && sem != null) {
+                        return new PlanAdmin(0,
+                                elect.getElectiveId(), elect.getElectiveName(),
+                                sem.getSemesterId(), sem.getYear(), sem.getSemesterNum(),
+                                Integer.parseInt(lecField.getText()),
+                                Integer.parseInt(pracField.getText()),
+                                Integer.parseInt(labField.getText()));
+                    }
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    private Dialog<StudentAdmin> createStudentDialog(StudentAdmin existing) {
+        Dialog<StudentAdmin> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Добавить студента" : "Редактировать студента");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        TextField surnameField = new TextField(existing != null ? existing.getSurname() : "");
+        TextField nameField = new TextField(existing != null ? existing.getName() : "");
+        TextField patronymicField = new TextField(existing != null ? existing.getPatronymic() : "");
+        TextField addressField = new TextField(existing != null ? existing.getAddress() : "");
+        TextField phoneField = new TextField(existing != null ? existing.getPhone() : "");
+
+        grid.add(new Label("Фамилия:"), 0, 0);
+        grid.add(surnameField, 1, 0);
+        grid.add(new Label("Имя:"), 0, 1);
+        grid.add(nameField, 1, 1);
+        grid.add(new Label("Отчество:"), 0, 2);
+        grid.add(patronymicField, 1, 2);
+        grid.add(new Label("Адрес:"), 0, 3);
+        grid.add(addressField, 1, 3);
+        grid.add(new Label("Телефон:"), 0, 4);
+        grid.add(phoneField, 1, 4);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                return new StudentAdmin(0,
+                        surnameField.getText(),
+                        nameField.getText(),
+                        patronymicField.getText(),
+                        addressField.getText(),
+                        phoneField.getText());
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    private Dialog<GradeAdmin> createGradeDialog(GradeAdmin existing) {
+        Dialog<GradeAdmin> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Добавить оценку" : "Редактировать оценку");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        ComboBox<EnrollmentAdmin> enrollCombo = new ComboBox<>(enrollmentsList);
+        enrollCombo.setConverter(new javafx.util.StringConverter<EnrollmentAdmin>() {
+            @Override
+            public String toString(EnrollmentAdmin object) {
+                return object != null ? object.getStudentName() + " - " + object.getElectiveName() : "";
+            }
+            @Override
+            public EnrollmentAdmin fromString(String string) {
+                return null;
+            }
+        });
+
+        DatePicker datePicker = new DatePicker(existing != null ? LocalDate.parse(existing.getGradeDate()) : LocalDate.now());
+        TextField valueField = new TextField(existing != null ? existing.getGradeValue() : "");
+
+        if (existing != null) {
+            enrollCombo.getSelectionModel().select(
+                    enrollmentsList.stream()
+                            .filter(e -> e.getStudentPlanId() == existing.getStudentPlanId())
+                            .findFirst().orElse(null)
+            );
+        }
+
+        grid.add(new Label("Запись студента:"), 0, 0);
+        grid.add(enrollCombo, 1, 0);
+        grid.add(new Label("Дата:"), 0, 1);
+        grid.add(datePicker, 1, 1);
+        grid.add(new Label("Оценка:"), 0, 2);
+        grid.add(valueField, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                EnrollmentAdmin enroll = enrollCombo.getValue();
+                if (enroll != null && !valueField.getText().isEmpty()) {
+                    return new GradeAdmin(0,
+                            enroll.getStudentPlanId(),
+                            enroll.getStudentName(),
+                            enroll.getElectiveName(),
+                            datePicker.getValue().toString(),
+                            valueField.getText());
+                }
+            }
+            return null;
+        });
+
+        return dialog;
+    }
     @FXML
     private void handleLogout() {
         try {
