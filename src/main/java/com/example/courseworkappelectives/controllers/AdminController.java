@@ -13,35 +13,33 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.Optional;
 
 public class AdminController {
-
     @FXML private TabPane tabPane;
 
-    //таблица Кафедры
-    @FXML private javafx.scene.control.TableView<Department> departmentsTable;
+    @FXML private TableView<Department> departmentsTable;
     @FXML private TableColumn<Department, Integer> deptIdColumn;
     @FXML private TableColumn<Department, String> deptNameColumn;
 
-    //таблица Факультативы
-    @FXML private javafx.scene.control.TableView<ElectiveAdmin> electivesTable;
+    @FXML private TableView<ElectiveAdmin> electivesTable;
     @FXML private TableColumn<ElectiveAdmin, Integer> electIdColumn;
     @FXML private TableColumn<ElectiveAdmin, String> electNameColumn;
     @FXML private TableColumn<ElectiveAdmin, Integer> electDeptIdColumn;
     @FXML private TableColumn<ElectiveAdmin, String> electDeptNameColumn;
 
-    //таблица Семестры
-    @FXML private javafx.scene.control.TableView<SemesterAdmin> semestersTable;
+    @FXML private TableView<SemesterAdmin> semestersTable;
     @FXML private TableColumn<SemesterAdmin, Integer> semIdColumn;
     @FXML private TableColumn<SemesterAdmin, Integer> semYearColumn;
     @FXML private TableColumn<SemesterAdmin, Integer> semNumColumn;
     @FXML private TableColumn<SemesterAdmin, Integer> semMinColumn;
 
-    //таблица Планы
-    @FXML private javafx.scene.control.TableView<PlanAdmin> plansTable;
+    @FXML private TableView<PlanAdmin> plansTable;
     @FXML private TableColumn<PlanAdmin, Integer> planIdCol;
     @FXML private TableColumn<PlanAdmin, Integer> planElectIdCol;
     @FXML private TableColumn<PlanAdmin, String> planElectCol;
@@ -53,8 +51,7 @@ public class AdminController {
     @FXML private TableColumn<PlanAdmin, Integer> planLabCol;
     @FXML private TableColumn<PlanAdmin, Integer> planTotalCol;
 
-    //таблица Студенты
-    @FXML private javafx.scene.control.TableView<StudentAdmin> studentsTable;
+    @FXML private TableView<StudentAdmin> studentsTable;
     @FXML private TableColumn<StudentAdmin, Integer> studIdColumn;
     @FXML private TableColumn<StudentAdmin, String> studSurnameColumn;
     @FXML private TableColumn<StudentAdmin, String> studNameColumn;
@@ -62,8 +59,7 @@ public class AdminController {
     @FXML private TableColumn<StudentAdmin, String> studAddressColumn;
     @FXML private TableColumn<StudentAdmin, String> studPhoneColumn;
 
-    //таблица Записи (на факультативы)
-    @FXML private javafx.scene.control.TableView<EnrollmentAdmin> enrollmentsTable;
+    @FXML private TableView<EnrollmentAdmin> enrollmentsTable;
     @FXML private TableColumn<EnrollmentAdmin, Integer> enrIdColumn;
     @FXML private TableColumn<EnrollmentAdmin, Integer> enrStudIdColumn;
     @FXML private TableColumn<EnrollmentAdmin, String> enrStudColumn;
@@ -72,7 +68,6 @@ public class AdminController {
     @FXML private TableColumn<EnrollmentAdmin, Integer> enrYearColumn;
     @FXML private TableColumn<EnrollmentAdmin, Integer> enrSemColumn;
 
-    //таблица Оценки
     @FXML private TableView<GradeAdmin> gradesAdminTable;
     @FXML private TableColumn<GradeAdmin, Integer> grIdColumn;
     @FXML private TableColumn<GradeAdmin, Integer> grEnrIdColumn;
@@ -81,7 +76,19 @@ public class AdminController {
     @FXML private TableColumn<GradeAdmin, String> grDateColumn;
     @FXML private TableColumn<GradeAdmin, String> grValueColumn;
 
+    private int userId;
+    private ObservableList<Department> departmentsList = FXCollections.observableArrayList();
+    private ObservableList<ElectiveAdmin> electivesList = FXCollections.observableArrayList();
+    private ObservableList<SemesterAdmin> semestersList = FXCollections.observableArrayList();
+    private ObservableList<PlanAdmin> plansList = FXCollections.observableArrayList();
+    private ObservableList<StudentAdmin> studentsList = FXCollections.observableArrayList();
+    private ObservableList<EnrollmentAdmin> enrollmentsList = FXCollections.observableArrayList();
+    private ObservableList<GradeAdmin> gradesList = FXCollections.observableArrayList();
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+        loadAllData();
+    }
 
     @FXML
     private void initialize() {
@@ -130,23 +137,6 @@ public class AdminController {
         grElectColumn.setCellValueFactory(new PropertyValueFactory<>("electiveName"));
         grDateColumn.setCellValueFactory(new PropertyValueFactory<>("gradeDate"));
         grValueColumn.setCellValueFactory(new PropertyValueFactory<>("gradeValue"));
-    }
-
-
-    private int userId;
-    private ObservableList<Department> departmentsList = FXCollections.observableArrayList();
-    private ObservableList<ElectiveAdmin> electivesList = FXCollections.observableArrayList();
-    private ObservableList<SemesterAdmin> semestersList = FXCollections.observableArrayList();
-    private ObservableList<PlanAdmin> plansList = FXCollections.observableArrayList();
-    private ObservableList<StudentAdmin> studentsList = FXCollections.observableArrayList();
-    private ObservableList<EnrollmentAdmin> enrollmentsList = FXCollections.observableArrayList();
-    private ObservableList<GradeAdmin> gradesList = FXCollections.observableArrayList();
-
-
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-        loadAllData();
     }
 
     private void loadAllData() {
@@ -463,57 +453,6 @@ public class AdminController {
                 showError("Ошибка удаления факультатива");
             }
         }
-    }
-
-    private Dialog<ElectiveAdmin> createElectiveDialog(ElectiveAdmin existing) {
-        Dialog<ElectiveAdmin> dialog = new Dialog<>();
-        dialog.setTitle(existing == null ? "Добавить факультатив" : "Редактировать факультатив");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
-        TextField nameField = new TextField(existing != null ? existing.getElectiveName() : "");
-        ComboBox<Department> deptCombo = new ComboBox<>(departmentsList);
-        deptCombo.setConverter(new javafx.util.StringConverter<Department>() {
-            @Override
-            public String toString(Department object) {
-                return object != null ? object.getDepartmentName() : "";
-            }
-            @Override
-            public Department fromString(String string) {
-                return null;
-            }
-        });
-
-        if (existing != null) {
-            deptCombo.getSelectionModel().select(
-                    departmentsList.stream()
-                            .filter(d -> d.getDepartmentId() == existing.getDepartmentId())
-                            .findFirst().orElse(null)
-            );
-        }
-
-        grid.add(new Label("Название:"), 0, 0);
-        grid.add(nameField, 1, 0);
-        grid.add(new Label("Кафедра:"), 0, 1);
-        grid.add(deptCombo, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        dialog.setResultConverter(button -> {
-            if (button == ButtonType.OK) {
-                Department dept = deptCombo.getValue();
-                if (dept != null && !nameField.getText().isEmpty()) {
-                    return new ElectiveAdmin(0, nameField.getText(), dept.getDepartmentId(), dept.getDepartmentName());
-                }
-            }
-            return null;
-        });
-
-        return dialog;
     }
 
     @FXML
@@ -943,6 +882,57 @@ public class AdminController {
         }
     }
 
+    private Dialog<ElectiveAdmin> createElectiveDialog(ElectiveAdmin existing) {
+        Dialog<ElectiveAdmin> dialog = new Dialog<>();
+        dialog.setTitle(existing == null ? "Добавить факультатив" : "Редактировать факультатив");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        TextField nameField = new TextField(existing != null ? existing.getElectiveName() : "");
+        ComboBox<Department> deptCombo = new ComboBox<>(departmentsList);
+        deptCombo.setConverter(new javafx.util.StringConverter<Department>() {
+            @Override
+            public String toString(Department object) {
+                return object != null ? object.getDepartmentName() : "";
+            }
+            @Override
+            public Department fromString(String string) {
+                return null;
+            }
+        });
+
+        if (existing != null) {
+            deptCombo.getSelectionModel().select(
+                    departmentsList.stream()
+                            .filter(d -> d.getDepartmentId() == existing.getDepartmentId())
+                            .findFirst().orElse(null)
+            );
+        }
+
+        grid.add(new Label("Название:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Кафедра:"), 0, 1);
+        grid.add(deptCombo, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                Department dept = deptCombo.getValue();
+                if (dept != null && !nameField.getText().isEmpty()) {
+                    return new ElectiveAdmin(0, nameField.getText(), dept.getDepartmentId(), dept.getDepartmentName());
+                }
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
     private Dialog<SemesterAdmin> createSemesterDialog(SemesterAdmin existing) {
         Dialog<SemesterAdmin> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Добавить семестр" : "Редактировать семестр");
@@ -1173,6 +1163,7 @@ public class AdminController {
 
         return dialog;
     }
+
     @FXML
     private void handleLogout() {
         try {
@@ -1198,5 +1189,141 @@ public class AdminController {
         alert.setContentText(message);
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
+    }
+    @FXML
+    private void handleEditProfile() {
+        try (Connection conn = DataBase.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT surname, user_name, patronymic, address, phone, password FROM users WHERE user_id = ?")) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String currentPassword = rs.getString("password");
+
+                TextField surnameField = new TextField(rs.getString("surname"));
+                TextField nameField = new TextField(rs.getString("user_name"));
+                TextField patronymicField = new TextField(rs.getString("patronymic"));
+                TextField addressField = new TextField(rs.getString("address"));
+                TextField phoneField = new TextField(rs.getString("phone"));
+                PasswordField currentPasswordField = new PasswordField();
+                PasswordField newPasswordField = new PasswordField();
+                PasswordField confirmPasswordField = new PasswordField();
+
+                currentPasswordField.setPromptText("Текущий пароль (для смены пароля)");
+                newPasswordField.setPromptText("Новый пароль");
+                confirmPasswordField.setPromptText("Подтвердите новый пароль");
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20));
+                grid.addRow(0, new Label("Фамилия:"), surnameField);
+                grid.addRow(1, new Label("Имя:"), nameField);
+                grid.addRow(2, new Label("Отчество:"), patronymicField);
+                grid.addRow(3, new Label("Адрес:"), addressField);
+                grid.addRow(4, new Label("Телефон:"), phoneField);
+                grid.addRow(5, new Label("Текущий пароль:"), currentPasswordField);
+                grid.addRow(6, new Label("Новый пароль:"), newPasswordField);
+                grid.addRow(7, new Label("Подтвердите пароль:"), confirmPasswordField);
+
+                Dialog<ButtonType> dialog = new Dialog<>();
+                dialog.setTitle("Редактирование профиля");
+                dialog.getDialogPane().setContent(grid);
+                dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+                Optional<ButtonType> result = dialog.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    String currentInput = currentPasswordField.getText();
+                    String newPassword = newPasswordField.getText();
+                    String confirmPassword = confirmPasswordField.getText();
+
+                    boolean wantsToChangePassword = !newPassword.isEmpty() || !confirmPassword.isEmpty() || !currentInput.isEmpty();
+
+                    if (wantsToChangePassword) {
+                        if (currentInput.isEmpty()) {
+                            showError("Для смены пароля введите текущий пароль");
+                            return;
+                        }
+
+                        boolean passwordValid = false;
+                        String inputHash = sha256(currentInput);
+
+                        if (currentPassword != null) {
+                            if (currentPassword.equalsIgnoreCase(inputHash)) {
+                                passwordValid = true;
+                            } else if (currentPassword.equals(currentInput)) {
+                                passwordValid = true;
+                            }
+                        }
+
+                        if (!passwordValid) {
+                            showError("Текущий пароль введен неверно");
+                            return;
+                        }
+                        if (newPassword.isEmpty()) {
+                            showError("Введите новый пароль");
+                            return;
+                        }
+                        if (!newPassword.equals(confirmPassword)) {
+                            showError("Новые пароли не совпадают");
+                            return;
+                        }
+
+                        String newPasswordHash = sha256(newPassword);
+                        if (newPasswordHash.equals(currentPassword)) {
+                            showError("Новый пароль должен отличаться от текущего");
+                            return;
+                        }
+
+                        try (PreparedStatement updatePs = conn.prepareStatement(
+                                "UPDATE users SET surname=?, user_name=?, patronymic=?, address=?, phone=?, password=? WHERE user_id=?")) {
+                            updatePs.setString(1, surnameField.getText());
+                            updatePs.setString(2, nameField.getText());
+                            updatePs.setString(3, patronymicField.getText());
+                            updatePs.setString(4, addressField.getText());
+                            updatePs.setString(5, phoneField.getText());
+                            updatePs.setString(6, newPasswordHash);
+                            updatePs.setInt(7, userId);
+                            updatePs.executeUpdate();
+                            showInfo("Данные и пароль успешно обновлены!");
+                        }
+                    } else {
+                        try (PreparedStatement updatePs = conn.prepareStatement(
+                                "UPDATE users SET surname=?, user_name=?, patronymic=?, address=?, phone=? WHERE user_id=?")) {
+                            updatePs.setString(1, surnameField.getText());
+                            updatePs.setString(2, nameField.getText());
+                            updatePs.setString(3, patronymicField.getText());
+                            updatePs.setString(4, addressField.getText());
+                            updatePs.setString(5, phoneField.getText());
+                            updatePs.setInt(6, userId);
+                            updatePs.executeUpdate();
+                            showInfo("Данные успешно обновлены!");
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("Ошибка при обновлении данных: " + e.getMessage());
+        }
+    }
+
+    private static String sha256(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] d = md.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(d.length * 2);
+            for (byte b : d) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 недоступен", e);
+        }
+    }
+
+    private void showInfo(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

@@ -23,7 +23,7 @@
 
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Button text="Изменить данные" styleClass="secondary-button"/>
+        <Button text="Изменить данные" onAction="#handleEditProfile" styleClass="secondary-button"/>
         <Button text="Выход" onAction="#handleLogout" styleClass="logout-button"/>
     </HBox>
 
