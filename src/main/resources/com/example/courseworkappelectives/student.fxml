@@ -51,7 +51,7 @@
                             <TableColumn fx:id="planSemesterColumn" text="Семестр"         prefWidth="90"/>
                             <TableColumn fx:id="planLectureColumn"  text="Лекции"          prefWidth="80"/>
                             <TableColumn fx:id="planPracticeColumn" text="Практики"        prefWidth="90"/>
-                            <TableColumn fx:id="planLabColumn"      text="Лабораторные"    prefWidth="110"/>
+                            <TableColumn fx:id="planLabColumn"      text="Лабораторные работы"    prefWidth="110"/>
                             <TableColumn fx:id="planTotalColumn"    text="Всего часов"     prefWidth="100"/>
                             <TableColumn fx:id="planActionColumn"   text="Действие"        prefWidth="120"/>
                         </columns>
@@ -76,7 +76,7 @@
                             <TableColumn fx:id="enrollSemesterColumn"   text="Семестр"         prefWidth="90"/>
                             <TableColumn fx:id="enrollLectureColumn"    text="Лекции"          prefWidth="80"/>
                             <TableColumn fx:id="enrollPracticeColumn"   text="Практики"        prefWidth="90"/>
-                            <TableColumn fx:id="enrollLabColumn"        text="Лабораторные"    prefWidth="110"/>
+                            <TableColumn fx:id="enrollLabColumn"        text="Лабораторные работы"    prefWidth="110"/>
                             <TableColumn fx:id="enrollTotalColumn"      text="Всего часов"     prefWidth="100"/>
                             <TableColumn fx:id="enrollFinalGradeColumn" text="Итоговая оценка" prefWidth="120"/>
                         </columns>
