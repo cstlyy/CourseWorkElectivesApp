@@ -8,9 +8,17 @@ public class EnrollmentAdmin {
     private final String electiveName;
     private final int year;
     private final int semester;
+    private final Integer finalGrade;
+
 
     public EnrollmentAdmin(int studentPlanId, int userId, String studentName,
                            int planId, String electiveName, int year, int semester) {
+        this(studentPlanId, userId, studentName, planId, electiveName, year, semester, null);
+    }
+
+    public EnrollmentAdmin(int studentPlanId, int userId, String studentName,
+                           int planId, String electiveName, int year, int semester,
+                           Integer finalGrade) {
         this.studentPlanId = studentPlanId;
         this.userId = userId;
         this.studentName = studentName;
@@ -18,6 +26,7 @@ public class EnrollmentAdmin {
         this.electiveName = electiveName;
         this.year = year;
         this.semester = semester;
+        this.finalGrade = finalGrade;
     }
 
     public int getStudentPlanId() { return studentPlanId; }
@@ -27,4 +36,5 @@ public class EnrollmentAdmin {
     public String getElectiveName() { return electiveName; }
     public int getYear() { return year; }
     public int getSemester() { return semester; }
+    public Integer getFinalGrade() { return finalGrade; }
 }

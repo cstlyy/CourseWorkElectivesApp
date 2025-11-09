@@ -50,6 +50,7 @@ public class StudentController {
     @FXML private TableColumn<StudentEnrollment, Integer> enrollPracticeColumn;
     @FXML private TableColumn<StudentEnrollment, Integer> enrollLabColumn;
     @FXML private TableColumn<StudentEnrollment, Integer> enrollTotalColumn;
+    @FXML private TableColumn<StudentEnrollment, Integer> enrollFinalGradeColumn;
 
     @FXML private TableView<StudentGrade> gradesTable;
     @FXML private TableColumn<StudentGrade, Integer> gradeIdColumn;
@@ -94,6 +95,7 @@ public class StudentController {
         enrollPracticeColumn.setCellValueFactory(new PropertyValueFactory<>("practiceHours"));
         enrollLabColumn.setCellValueFactory(new PropertyValueFactory<>("labHours"));
         enrollTotalColumn.setCellValueFactory(new PropertyValueFactory<>("totalHours"));
+        enrollFinalGradeColumn.setCellValueFactory(new PropertyValueFactory<>("finalGrade"));
 
         gradeIdColumn.setCellValueFactory(new PropertyValueFactory<>("gradeId"));
         gradeEnrollIdColumn.setCellValueFactory(new PropertyValueFactory<>("studentPlanId"));
@@ -207,21 +209,26 @@ public class StudentController {
     private void loadMyEnrollments() {
         enrollmentsList.clear();
 
-        String query = "SELECT sp.student_plan_id, sp.plan_id, e.elective_name, s.year, s.num, " +
-                "p.lecture_hours, p.practice_hours, p.lab_hours " +
-                "FROM student_plan sp " +
-                "JOIN plan p ON sp.plan_id = p.plan_id " +
-                "JOIN electives e ON p.elective_id = e.elective_id " +
-                "JOIN semesters s ON p.semester_id = s.semester_id " +
-                "WHERE sp.user_id = ? " +
-                "ORDER BY s.year DESC, s.num DESC";
+        String sql =
+                "SELECT sp.student_plan_id, sp.plan_id, e.elective_name, s.year, s.num, " +
+                        "       p.lecture_hours, p.practice_hours, p.lab_hours, " +
+                        "       (SELECT g.value_grade " +
+                        "          FROM grades g " +
+                        "         WHERE g.student_plan_id = sp.student_plan_id " +
+                        "         ORDER BY g.date_grade DESC, g.grade_id DESC " +
+                        "         LIMIT 1) AS final_grade " +
+                        "  FROM student_plan sp " +
+                        "  JOIN plan p       ON p.plan_id = sp.plan_id " +
+                        "  JOIN electives e  ON e.elective_id = p.elective_id " +
+                        "  JOIN semesters s  ON s.semester_id = p.semester_id " +
+                        " WHERE sp.user_id = ? " +
+                        " ORDER BY s.year DESC, s.num DESC, e.elective_name";
 
-        try (Connection conn = DataBase.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection c = DataBase.getInstance().getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
 
-            stmt.setInt(1, userId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     enrollmentsList.add(new StudentEnrollment(
                             rs.getInt("student_plan_id"),
@@ -231,16 +238,59 @@ public class StudentController {
                             rs.getInt("num"),
                             rs.getInt("lecture_hours"),
                             rs.getInt("practice_hours"),
-                            rs.getInt("lab_hours")
+                            rs.getInt("lab_hours"),
+                            rs.getInt("final_grade")
                     ));
                 }
             }
-
             myEnrollmentsTable.setItems(enrollmentsList);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            showError("Не удалось загрузить записи");
+        }
+
+        checkMinElectives();
+    }
+
+    private void checkMinElectives() {
+        String sql =
+                "SELECT s.year, s.num, s.min_electives, COUNT(*) AS chosen " +
+                        "  FROM student_plan sp " +
+                        "  JOIN plan p      ON p.plan_id = sp.plan_id " +
+                        "  JOIN semesters s ON s.semester_id = p.semester_id " +
+                        " WHERE sp.user_id = ? " +
+                        " GROUP BY s.year, s.num, s.min_electives " +
+                        " ORDER BY s.year, s.num";
+
+        StringBuilder msg = new StringBuilder();
+
+        try (Connection c = DataBase.getInstance().getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int year = rs.getInt("year");
+                    int sem  = rs.getInt("num");
+                    int min  = rs.getInt("min_electives");
+                    int got  = rs.getInt("chosen");
+                    if (got < min) {
+                        msg.append(String.format(
+                                "Год %d семестр %d: выбрано %d из %d требуемых\n",
+                                year, sem, got, min));
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return;
+        }
+
+        if (msg.length() > 0) {
+            showInfo("Не достигнут минимум по семестрам:\n\n" + msg);
         }
     }
+
+
 
     private void enrollInPlan(int planId) {
         try (Connection conn = DataBase.getInstance().getConnection();
@@ -249,15 +299,16 @@ public class StudentController {
 
             stmt.setInt(1, userId);
             stmt.setInt(2, planId);
-
             stmt.executeUpdate();
+
             loadAvailablePlans();
             loadMyEnrollments();
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Ошибка", "Не удалось записаться на факультатив");
+            showError("Не удалось записаться на факультатив");
         }
     }
+
 
     @FXML
     private void handleLogout() {

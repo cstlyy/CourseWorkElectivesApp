@@ -9,6 +9,7 @@ public class StudentEnrollment {
     private final int lectureHours;
     private final int practiceHours;
     private final int labHours;
+    private final int finalGrade; // 0 = нет оценки
 
     public StudentEnrollment(int studentPlanId,
                              int planId,
@@ -17,7 +18,8 @@ public class StudentEnrollment {
                              int semester,
                              int lectureHours,
                              int practiceHours,
-                             int labHours) {
+                             int labHours,
+                             int finalGrade) {
         this.studentPlanId = studentPlanId;
         this.planId = planId;
         this.electiveName = electiveName;
@@ -26,6 +28,7 @@ public class StudentEnrollment {
         this.lectureHours = lectureHours;
         this.practiceHours = practiceHours;
         this.labHours = labHours;
+        this.finalGrade = finalGrade;
     }
 
     public int getStudentPlanId() { return studentPlanId; }
@@ -36,7 +39,6 @@ public class StudentEnrollment {
     public int getLectureHours() { return lectureHours; }
     public int getPracticeHours() { return practiceHours; }
     public int getLabHours() { return labHours; }
-
     public int getTotalHours() { return lectureHours + practiceHours + labHours; }
+    public int getFinalGrade() { return finalGrade; }
 }
-

@@ -67,6 +67,8 @@ public class AdminController {
     @FXML private TableColumn<EnrollmentAdmin, String> enrElectColumn;
     @FXML private TableColumn<EnrollmentAdmin, Integer> enrYearColumn;
     @FXML private TableColumn<EnrollmentAdmin, Integer> enrSemColumn;
+    @FXML private TableColumn<EnrollmentAdmin, Integer> enrFinalGradeColumn;
+
 
     @FXML private TableView<GradeAdmin> gradesAdminTable;
     @FXML private TableColumn<GradeAdmin, Integer> grIdColumn;
@@ -130,6 +132,8 @@ public class AdminController {
         enrElectColumn.setCellValueFactory(new PropertyValueFactory<>("electiveName"));
         enrYearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
         enrSemColumn.setCellValueFactory(new PropertyValueFactory<>("semester"));
+        enrFinalGradeColumn.setCellValueFactory(new PropertyValueFactory<>("finalGrade"));
+
 
         grIdColumn.setCellValueFactory(new PropertyValueFactory<>("gradeId"));
         grEnrIdColumn.setCellValueFactory(new PropertyValueFactory<>("studentPlanId"));
@@ -260,19 +264,34 @@ public class AdminController {
 
     private void loadEnrollments() {
         enrollmentsList.clear();
+
+        final String sql =
+                "SELECT sp.student_plan_id, sp.user_id, sp.plan_id, " +
+                        "       CONCAT(u.surname, ' ', u.user_name) AS student_name, " +
+                        "       e.elective_name, s.year, s.num, " +
+                        "       (SELECT g.value_grade " +
+                        "          FROM grades g " +
+                        "         WHERE g.student_plan_id = sp.student_plan_id " +
+                        "         ORDER BY g.date_grade DESC, g.grade_id DESC " +
+                        "         LIMIT 1) AS final_grade " +
+                        "  FROM student_plan sp " +
+                        "  LEFT JOIN users u     ON sp.user_id = u.user_id " +
+                        "  LEFT JOIN plan p      ON sp.plan_id = p.plan_id " +
+                        "  LEFT JOIN electives e ON p.elective_id = e.elective_id " +
+                        "  LEFT JOIN semesters s ON p.semester_id = s.semester_id " +
+                        " ORDER BY s.year DESC, s.num DESC, e.elective_name, student_name";
+
         try (Connection conn = DataBase.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(
-                     "SELECT sp.student_plan_id, sp.user_id, sp.plan_id, " +
-                             "CONCAT(u.surname, ' ', u.user_name) as student_name, " +
-                             "e.elective_name, s.year, s.num " +
-                             "FROM student_plan sp " +
-                             "LEFT JOIN users u ON sp.user_id = u.user_id " +
-                             "LEFT JOIN plan p ON sp.plan_id = p.plan_id " +
-                             "LEFT JOIN electives e ON p.elective_id = e.elective_id " +
-                             "LEFT JOIN semesters s ON p.semester_id = s.semester_id " +
-                             "ORDER BY sp.student_plan_id ASC")) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
+                Integer finalGrade = null;
+                int fg = rs.getInt("final_grade");
+                if (!rs.wasNull()) {
+                    finalGrade = fg;
+                }
+
                 enrollmentsList.add(new EnrollmentAdmin(
                         rs.getInt("student_plan_id"),
                         rs.getInt("user_id"),
@@ -280,10 +299,12 @@ public class AdminController {
                         rs.getInt("plan_id"),
                         rs.getString("elective_name"),
                         rs.getInt("year"),
-                        rs.getInt("num")
+                        rs.getInt("num"),
+                        finalGrade
                 ));
             }
             enrollmentsTable.setItems(enrollmentsList);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

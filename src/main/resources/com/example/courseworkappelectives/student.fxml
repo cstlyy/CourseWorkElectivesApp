@@ -35,7 +35,6 @@
         <Label fx:id="studentInfoLabel" styleClass="student-info"/>
 
         <TabPane fx:id="tabPane" styleClass="custom-tabs" VBox.vgrow="ALWAYS">
-
             <Tab text="Доступные планы" closable="false">
                 <VBox spacing="15">
                     <padding>
@@ -46,15 +45,15 @@
 
                     <TableView fx:id="availablePlansTable" VBox.vgrow="ALWAYS" prefHeight="300">
                         <columns>
-                            <TableColumn fx:id="planIdColumn" text="ID плана" prefWidth="80"/>
-                            <TableColumn fx:id="planElectiveColumn" text="Факультатив" prefWidth="200"/>
-                            <TableColumn fx:id="planYearColumn" text="Год" prefWidth="70"/>
-                            <TableColumn fx:id="planSemesterColumn" text="Семестр" prefWidth="90"/>
-                            <TableColumn fx:id="planLectureColumn" text="Лекции" prefWidth="80"/>
-                            <TableColumn fx:id="planPracticeColumn" text="Практики" prefWidth="90"/>
-                            <TableColumn fx:id="planLabColumn" text="Лабораторные работы" prefWidth="70"/>
-                            <TableColumn fx:id="planTotalColumn" text="Всего часов" prefWidth="100"/>
-                            <TableColumn fx:id="planActionColumn" text="Действие" prefWidth="120"/>
+                            <TableColumn fx:id="planIdColumn"       text="ID плана"        prefWidth="80"/>
+                            <TableColumn fx:id="planElectiveColumn" text="Факультатив"     prefWidth="200"/>
+                            <TableColumn fx:id="planYearColumn"     text="Год"             prefWidth="70"/>
+                            <TableColumn fx:id="planSemesterColumn" text="Семестр"         prefWidth="90"/>
+                            <TableColumn fx:id="planLectureColumn"  text="Лекции"          prefWidth="80"/>
+                            <TableColumn fx:id="planPracticeColumn" text="Практики"        prefWidth="90"/>
+                            <TableColumn fx:id="planLabColumn"      text="Лабораторные"    prefWidth="110"/>
+                            <TableColumn fx:id="planTotalColumn"    text="Всего часов"     prefWidth="100"/>
+                            <TableColumn fx:id="planActionColumn"   text="Действие"        prefWidth="120"/>
                         </columns>
                     </TableView>
                 </VBox>
@@ -70,15 +69,16 @@
 
                     <TableView fx:id="myEnrollmentsTable" VBox.vgrow="ALWAYS" prefHeight="300">
                         <columns>
-                            <TableColumn fx:id="enrollIdColumn" text="ID записи" prefWidth="90"/>
-                            <TableColumn fx:id="enrollPlanIdColumn" text="ID плана" prefWidth="90"/>
-                            <TableColumn fx:id="enrollElectiveColumn" text="Факультатив" prefWidth="200"/>
-                            <TableColumn fx:id="enrollYearColumn" text="Год" prefWidth="70"/>
-                            <TableColumn fx:id="enrollSemesterColumn" text="Семестр" prefWidth="90"/>
-                            <TableColumn fx:id="enrollLectureColumn" text="Лекции" prefWidth="80"/>
-                            <TableColumn fx:id="enrollPracticeColumn" text="Практики" prefWidth="90"/>
-                            <TableColumn fx:id="enrollLabColumn" text="Лабораторные работы" prefWidth="70"/>
-                            <TableColumn fx:id="enrollTotalColumn" text="Всего часов" prefWidth="100"/>
+                            <TableColumn fx:id="enrollIdColumn"         text="ID записи"       prefWidth="90"/>
+                            <TableColumn fx:id="enrollPlanIdColumn"     text="ID плана"        prefWidth="90"/>
+                            <TableColumn fx:id="enrollElectiveColumn"   text="Факультатив"     prefWidth="200"/>
+                            <TableColumn fx:id="enrollYearColumn"       text="Год"             prefWidth="70"/>
+                            <TableColumn fx:id="enrollSemesterColumn"   text="Семестр"         prefWidth="90"/>
+                            <TableColumn fx:id="enrollLectureColumn"    text="Лекции"          prefWidth="80"/>
+                            <TableColumn fx:id="enrollPracticeColumn"   text="Практики"        prefWidth="90"/>
+                            <TableColumn fx:id="enrollLabColumn"        text="Лабораторные"    prefWidth="110"/>
+                            <TableColumn fx:id="enrollTotalColumn"      text="Всего часов"     prefWidth="100"/>
+                            <TableColumn fx:id="enrollFinalGradeColumn" text="Итоговая оценка" prefWidth="120"/>
                         </columns>
                     </TableView>
                 </VBox>
@@ -94,13 +94,13 @@
 
                     <TableView fx:id="gradesTable" VBox.vgrow="ALWAYS" prefHeight="300">
                         <columns>
-                            <TableColumn fx:id="gradeIdColumn" text="ID оценки" prefWidth="90"/>
-                            <TableColumn fx:id="gradeEnrollIdColumn" text="ID записи" prefWidth="90"/>
+                            <TableColumn fx:id="gradeIdColumn"       text="ID оценки"  prefWidth="90"/>
+                            <TableColumn fx:id="gradeEnrollIdColumn" text="ID записи"  prefWidth="90"/>
                             <TableColumn fx:id="gradeElectiveColumn" text="Факультатив" prefWidth="250"/>
-                            <TableColumn fx:id="gradeYearColumn" text="Год" prefWidth="70"/>
-                            <TableColumn fx:id="gradeSemesterColumn" text="Семестр" prefWidth="90"/>
-                            <TableColumn fx:id="gradeDateColumn" text="Дата" prefWidth="120"/>
-                            <TableColumn fx:id="gradeValueColumn" text="Оценка" prefWidth="80"/>
+                            <TableColumn fx:id="gradeYearColumn"     text="Год"        prefWidth="70"/>
+                            <TableColumn fx:id="gradeSemesterColumn" text="Семестр"    prefWidth="90"/>
+                            <TableColumn fx:id="gradeDateColumn"     text="Дата"       prefWidth="120"/>
+                            <TableColumn fx:id="gradeValueColumn"    text="Оценка"     prefWidth="80"/>
                         </columns>
                     </TableView>
                 </VBox>
